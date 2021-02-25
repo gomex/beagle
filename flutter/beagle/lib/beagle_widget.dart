@@ -21,23 +21,37 @@ import 'package:beagle/beagle_sdk.dart';
 import 'package:beagle/components/beagle_undefined_widget.dart';
 import 'package:beagle/interface/beagle_view.dart';
 import 'package:beagle/model/beagle_ui_element.dart';
+import 'package:beagle/model/network_options.dart';
+import 'package:beagle/model/network_strategy.dart';
 import 'package:beagle/model/route.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_js/extensions/xhr.dart';
 
 typedef OnCreateViewListener = void Function(BeagleView view);
+
+class ScreenRequest extends NetworkOptions {
+  ScreenRequest(
+    this.url, {
+    HttpMethod method,
+    Map<String, String> headers,
+    NetworkStrategy strategy,
+  }) : super(method: method, headers: headers, strategy: strategy);
+
+  final String url;
+}
 
 /// TODO: THE UNIT TEST WILL BE WRITE AFTER RESOLVE DEPENDENCY INJECTION
 /// A widget that displays content of beagle.
 class BeagleWidget extends StatefulWidget {
   const BeagleWidget({
     Key key,
-    this.url,
+    this.screenRequest,
     this.onCreateView,
     this.screenJson,
   }) : super(key: key);
 
-  /// Server URL will be used to make a request.
-  final String url;
+  /// that represents a remote screen to be shown.
+  final ScreenRequest screenRequest;
 
   /// that represents a local screen to be shown.
   final String screenJson;
@@ -63,16 +77,17 @@ class _BeagleWidget extends State<BeagleWidget> {
   Future<void> _startBeagleView() async {
     await BeagleSdk.getService().start();
 
-    _view = BeagleSdk.getService().createView()
-      ..subscribe((tree) {
-        final widgetLoaded = _buildViewFromTree(tree);
-        setState(() {
-          widgetState = widgetLoaded;
-        });
-      });
+    _view =
+        BeagleSdk.getService().createView(networkOptions: widget.screenRequest)
+          ..subscribe((tree) {
+            final widgetLoaded = _buildViewFromTree(tree);
+            setState(() {
+              widgetState = widgetLoaded;
+            });
+          });
 
-    if (widget.url != null) {
-      await _view.getNavigator().pushView(RemoteView(widget.url));
+    if (widget.screenRequest != null) {
+      await _view.getNavigator().pushView(RemoteView(widget.screenRequest.url));
     } else {
       await _view
           .getNavigator()
@@ -95,6 +110,6 @@ class _BeagleWidget extends State<BeagleWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return widgetState ??  const SizedBox.shrink();
+    return widgetState ?? const SizedBox.shrink();
   }
 }

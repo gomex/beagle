@@ -106,7 +106,7 @@ class BeagleSampleApp extends StatelessWidget {
         body: BeagleWidget(
           screenJson: '''
                 {
-                      "_beagleComponent_": "beagle:bddutton",
+                      "_beagleComponent_": "beagle:button",
                       "text": "Beagle Button",
                       "disabled": false,
                       "onPress": [

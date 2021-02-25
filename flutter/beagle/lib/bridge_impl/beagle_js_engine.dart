@@ -25,8 +25,10 @@ import 'package:beagle/interface/storage.dart';
 import 'package:beagle/interface/types.dart';
 import 'package:beagle/model/beagle_action.dart';
 import 'package:beagle/model/beagle_ui_element.dart';
+import 'package:beagle/model/network_options.dart';
 import 'package:beagle/model/request.dart';
 import 'package:beagle/model/response.dart';
+import 'package:beagle/utils/enum.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_js/extensions/xhr.dart';
@@ -253,8 +255,19 @@ class BeagleJSEngine {
   }
 
   // todo: increment this to pass more configurations
-  static String createBeagleView() {
-    final result = js.evaluate('global.beagle.createBeagleView()');
+  static String createBeagleView(NetworkOptions networkOptions) {
+    Map<String, dynamic> params;
+
+    if (networkOptions != null && networkOptions.method != null) {
+      params = {
+        'method': EnumUtils.name(networkOptions.method),
+        'headers': networkOptions.headers,
+        'strategy': EnumUtils.name(networkOptions.strategy),
+      };
+    }
+
+    final result =
+        js.evaluate('global.beagle.createBeagleView(${json.encode(params)})');
     final id = result.stringResult;
     debugPrint('created beagle view with id $id');
     return id;

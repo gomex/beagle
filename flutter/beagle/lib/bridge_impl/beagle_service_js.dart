@@ -127,6 +127,6 @@ class BeagleServiceJS implements BeagleService {
   @override
   BeagleView createView(
       {NetworkOptions networkOptions, String initialControllerId}) {
-    return BeagleViewJS();
+    return BeagleViewJS(networkOptions: networkOptions, initialControllerId: initialControllerId);
   }
 }

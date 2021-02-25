@@ -31,7 +31,7 @@ class BeagleViewJS implements BeagleView {
       NetworkOptions networkOptions,
       // ignore: avoid_unused_constructor_parameters
       String initialControllerId}) {
-    _id = BeagleJSEngine.createBeagleView();
+    _id = BeagleJSEngine.createBeagleView(networkOptions);
     BeagleViewJS.views[_id] = this;
     _navigator = BeagleNavigatorJS(_id);
     _renderer = RendererJS(_id);
